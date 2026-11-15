@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>미국 자본시장 구조 — 인터랙티브 학습 포털</title>
+  <meta name="description" content="[20261113]_미국_자본시장구조.pdf 기반 14개 챕터 해설, 용어 사전, 미시구조 시뮬레이터">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('uscm-theme');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (saved === 'dark' || (!saved && prefersDark)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">본문으로 바로가기</a>
+
+  <div class="reading-progress" aria-hidden="true">
+    <div class="reading-progress-bar" id="reading-progress-bar"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <button type="button" class="icon-btn mobile-menu-btn" id="mobile-menu-btn" aria-label="챕터 목차 열기" aria-expanded="false" hidden>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <a href="#home" class="brand" id="brand-home-link">
+          <span class="brand-badge" aria-hidden="true">US</span>
+          <span class="brand-text">
+            <strong>미국 자본시장 구조</strong>
+            <small>Market Microstructure Atlas</small>
+          </span>
+        </a>
+      </div>
+
+      <nav class="primary-nav" role="tablist" aria-label="주요 화면 전환">
+        <button type="button" class="nav-tab is-active" role="tab" aria-selected="true" data-view="home">홈 / 전체 지도</button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="reader">챕터 학습</button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="labs">인터랙티브 랩</button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="glossary">용어 사전 <span class="pill-count" id="nav-glossary-count">70</span></button>
+      </nav>
+
+      <div class="topbar-right">
+        <button type="button" class="search-trigger" id="open-search-btn" aria-label="전체 검색 열기 (Ctrl+K)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span class="search-trigger-text">법규 · 용어 · 챕터 검색</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+        <div class="progress-badge" id="global-progress-badge" title="완료한 챕터 수">0 / 14 완료</div>
+        <button type="button" class="icon-btn" id="theme-toggle-btn" aria-label="다크 모드 전환" aria-pressed="false" title="테마 전환">
+          <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="main-shell">
+    <!-- VIEW 1: HOME / OVERVIEW -->
+    <section id="view-home" class="view-section is-active" aria-labelledby="home-hero-title">
+      <div class="home-container">
+        <div class="hero-card">
+          <div class="hero-copy">
+            <div class="hero-eyebrow">SOURCE: [20261113]_미국_자본시장구조.pdf · 4 PARTS · 14 CHAPTERS</div>
+            <h1 id="home-hero-title">미국 자본시장 구조<br><span class="accent-gradient">법규부터 HFT·종가 경매까지 완벽 해부</span></h1>
+            <p class="hero-desc">
+              85쪽 분량의 원문 PDF를 <strong>14개의 주제별 Markdown 챕터</strong>로 세분화하고,
+              초보자도 직관적으로 이해할 수 있도록 <strong>핵심 용어 사전 · 쉬운 비유 · 숫자 계산 예시 · KRX 비교</strong>를 덧붙여 구축한 학습 포털입니다.
+            </p>
+            <div class="hero-actions">
+              <button type="button" class="btn btn-primary" id="hero-start-btn">Ch 01부터 학습 시작</button>
+              <button type="button" class="btn btn-secondary" data-jump-view="labs">인터랙티브 랩 체험</button>
+              <button type="button" class="btn btn-ghost" data-jump-view="glossary">용어 사전 70선 보기</button>
+            </div>
+          </div>
+          <div class="hero-stats-grid" aria-label="미국 자본시장 핵심 지표">
+            <div class="stat-tile">
+              <span class="stat-label">장외 체결 비중 (OTC + ATS)</span>
+              <strong class="stat-value">46 ~ 52%</strong>
+              <span class="stat-sub">OTC 내부화 35~38% · ATS 11~14%</span>
+            </div>
+            <div class="stat-tile">
+              <span class="stat-label">Taker 수수료 법정 상한</span>
+              <strong class="stat-value">30 mil</strong>
+              <span class="stat-sub">Reg NMS Rule 610 ($0.0030/주)</span>
+            </div>
+            <div class="stat-tile">
+              <span class="stat-label">DTCC CNS 다자간 상쇄율</span>
+              <strong class="stat-value">98% +</strong>
+              <span class="stat-sub">결제일 실제 이동 규모는 ~2%</span>
+            </div>
+            <div class="stat-tile">
+              <span class="stat-label">종가 단일가 (Closing) 비중</span>
+              <strong class="stat-value">6.5 ~ 8.5%</strong>
+              <span class="stat-sub">Quad Witching Day 20% 이상</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Market Share & Revenue Snapshot -->
+        <div class="snapshot-grid">
+          <div class="panel-card">
+            <div class="panel-head">
+              <h2>미국 주식시장 플랫폼별 점유율 (2024~2025 누적)</h2>
+              <span class="badge badge-blue">표 2-8 요약</span>
+            </div>
+            <div class="bar-chart" id="home-share-chart"></div>
+            <p class="panel-footnote">정규 거래소(NYSE·Nasdaq·Cboe·독립) 외에 도매상 내부화(OTC)와 40여 개 ATS가 시장 거래대금의 절반 가까이를 차지합니다.</p>
+          </div>
+          <div class="panel-card">
+            <div class="panel-head">
+              <h2>주요 거래소 주식사업부 수익 구성 (2024년)</h2>
+              <span class="badge badge-teal">표 2-4 요약</span>
+            </div>
+            <div class="bar-chart" id="home-rev-chart"></div>
+            <p class="panel-footnote">ICE(NYSE)·Nasdaq은 거래 체결 수수료보다 마켓 데이터·코로케이션·상장 등 <strong>비거래 고정 수익(64~70%)</strong> 비중이 훨씬 높습니다.</p>
+          </div>
+        </div>
+
+        <!-- 4 Parts Chapter Grid -->
+        <div class="curriculum-header">
+          <div>
+            <h2>전체 커리큘럼 (14개 챕터 + 전체 가이드)</h2>
+            <p>각 카드를 클릭하면 원문 본문과 추가 설명자료가 나뉜 3단 리더로 이동합니다.</p>
+          </div>
+          <div class="curriculum-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="open-overview-btn">전체 가이드(README) 보기</button>
+          </div>
+        </div>
+        <div id="home-parts-grid" class="parts-grid"></div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: CHAPTER READER -->
+    <section id="view-reader" class="view-section" aria-label="챕터 학습 리더">
+      <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
+      <div class="reader-layout">
+        <aside class="reader-sidebar" id="reader-sidebar" aria-label="챕터 네비게이션">
+          <div class="sidebar-head">
+            <span class="sidebar-title">목차 (4 Parts · 14 Ch)</span>
+            <button type="button" class="icon-btn sidebar-close-btn" id="sidebar-close-btn" aria-label="목차 닫기" hidden>✕</button>
+          </div>
+          <div class="sidebar-nav-list" id="sidebar-nav-list"></div>
+        </aside>
+
+        <article class="reader-main" id="reader-main">
+          <div class="chapter-header-card" id="chapter-header-card">
+            <!-- Populated by JS -->
+          </div>
+
+          <div class="reader-controls-bar">
+            <div class="mode-switch" role="group" aria-label="콘텐츠 표시 모드">
+              <button type="button" class="mode-btn is-active" data-read-mode="all">전체 보기 (원문 + 해설)</button>
+              <button type="button" class="mode-btn" data-read-mode="core">원문 핵심만</button>
+              <button type="button" class="mode-btn" data-read-mode="supp">추가 설명·예시만</button>
+            </div>
+            <div class="reader-meta-actions">
+              <button type="button" class="btn btn-sm btn-outline" id="toggle-complete-btn">✓ 학습 완료 표시</button>
+            </div>
+          </div>
+
+          <div id="chapter-body-core" class="prose"></div>
+          <div id="chapter-supp-banner" class="supp-divider" hidden>
+            <span>추가 설명자료 · 용어 해설 · 쉬운 비유 · 실전 예시</span>
+          </div>
+          <div id="chapter-body-supp" class="prose prose-supp"></div>
+
+          <section id="chapter-quiz-box" class="quiz-box" hidden aria-label="챕터 이해도 점검 퀴즈"></section>
+
+          <footer class="chapter-footer-nav" id="chapter-footer-nav"></footer>
+        </article>
+
+        <aside class="reader-toc" aria-label="이 챕터 세부 목차">
+          <div class="toc-sticky">
+            <div class="toc-title">이 챕터 목차</div>
+            <nav id="chapter-toc-list" class="toc-list"></nav>
+            <div class="toc-glossary-box" id="toc-glossary-box"></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- VIEW 3: INTERACTIVE LABS -->
+    <section id="view-labs" class="view-section" aria-label="인터랙티브 시뮬레이터 랩">
+      <div class="labs-container">
+        <div class="labs-hero">
+          <h1>미시구조 인터랙티브 랩 (Interactive Labs)</h1>
+          <p>문서 속 공식과 매칭 로직을 직접 수치를 바꿔가며 실험해 보세요.</p>
+        </div>
+
+        <div class="lab-tabs" role="tablist" aria-label="시뮬레이터 선택">
+          <button type="button" class="lab-tab is-active" role="tab" aria-selected="true" data-lab="lab-pfof">1. PFOF · 수수료 구조 계산기</button>
+          <button type="button" class="lab-tab" role="tab" aria-selected="false" data-lab="lab-auction">2. Nasdaq · NYSE 종가 경매 시뮬레이터</button>
+          <button type="button" class="lab-tab" role="tab" aria-selected="false" data-lab="lab-flow">3. Order Flow &amp; SOR 경로 추적기</button>
+        </div>
+
+        <!-- LAB 1: PFOF & Fee Calculator -->
+        <div id="lab-pfof" class="lab-panel is-active">
+          <div class="lab-grid">
+            <div class="panel-card">
+              <h2>파라미터 설정 (Part I·II·III 통합)</h2>
+              <div class="form-grid">
+                <label class="field">
+                  <span>주문 수량 (주)</span>
+                  <input type="number" id="lab1-shares" value="1000" min="1" max="100000" step="100">
+                </label>
+                <label class="field">
+                  <span>NBBO 최우선 매수 (NBB, $)</span>
+                  <input type="number" id="lab1-nbb" value="50.00" min="1" step="0.01">
+                </label>
+                <label class="field">
+                  <span>NBBO 최우선 매도 (NBO, $)</span>
+                  <input type="number" id="lab1-nbo" value="50.04" min="1" step="0.01">
+                </label>
+                <label class="field">
+                  <span>도매상 가격개선 (NBO 대비 할인 $/주)</span>
+                  <input type="number" id="lab1-pi" value="0.015" min="0" max="0.2" step="0.001">
+                </label>
+                <label class="field">
+                  <span>PFOF 단가 ($/주)</span>
+                  <input type="number" id="lab1-pfof" value="0.0015" min="0" max="0.02" step="0.0001">
+                </label>
+                <label class="field">
+                  <span>Lit Maker-Taker: Take Fee (밀/주, 상한 3.0)</span>
+                  <input type="number" id="lab1-take" value="3.0" min="0" max="3.0" step="0.1">
+                </label>
+                <label class="field">
+                  <span>Lit Maker-Taker: Maker Rebate (밀/주)</span>
+                  <input type="number" id="lab1-rebate" value="2.5" min="0" max="3.5" step="0.1">
+                </label>
+                <label class="field">
+                  <span>Inverted 거래소: Maker Fee / Taker Rebate (밀)</span>
+                  <div class="dual-input">
+                    <input type="number" id="lab1-inv-fee" value="2.0" min="0" max="3.0" step="0.1" aria-label="Inverted Maker Fee">
+                    <input type="number" id="lab1-inv-reb" value="1.5" min="0" max="3.0" step="0.1" aria-label="Inverted Taker Rebate">
+                  </div>
+                </label>
+              </div>
+              <div class="preset-row">
+                <button type="button" class="btn btn-sm btn-ghost" id="lab1-preset-pdf">원문 Ch 08 예시 ($50.00×$50.04) 복원</button>
+                <button type="button" class="btn btn-sm btn-ghost" id="lab1-preset-tight">초박형 1센트 스프레드 ($100.00×$100.01)</button>
+              </div>
+            </div>
+
+            <div class="panel-card">
+              <h2>실시간 수익·비용 분해 결과 (매수 Taker 기준)</h2>
+              <div id="lab1-results" class="lab-results"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LAB 2: Auction Simulator -->
+        <div id="lab-auction" class="lab-panel">
+          <div class="sublab-switch" role="group" aria-label="옥션 모드 선택">
+            <button type="button" class="mode-btn is-active" data-sublab="nasdaq-ep">Nasdaq: Late LOC Price Sliding &amp; EP 4단계</button>
+            <button type="button" class="mode-btn" data-sublab="nyse-dorder">NYSE: D-Order 스텔스 &amp; Parity (1/N) 배분</button>
+          </div>
+
+          <div id="sublab-nasdaq-ep" class="sublab-box is-active">
+            <div class="lab-grid">
+              <div class="panel-card">
+                <h2>15:55 이후 Late LOC Price Sliding 테스트</h2>
+                <div class="form-grid">
+                  <label class="field">
+                    <span>15:55 Nasdaq Best Bid ($)</span>
+                    <input type="number" id="lab2-bid" value="99.90" step="0.05">
+                  </label>
+                  <label class="field">
+                    <span>15:55 Nasdaq Best Offer ($)</span>
+                    <input type="number" id="lab2-ask" value="100.10" step="0.05">
+                  </label>
+                  <label class="field">
+                    <span>15:55 Last Sale Price ($)</span>
+                    <input type="number" id="lab2-last" value="100.05" step="0.05">
+                  </label>
+                  <label class="field">
+                    <span>내 매수 Late LOC 제출가 ($)</span>
+                    <input type="number" id="lab2-loc-price" value="100.50" step="0.05">
+                  </label>
+                  <label class="field">
+                    <span>내 매수 Late LOC 수량 (주)</span>
+                    <input type="number" id="lab2-loc-qty" value="1500" step="500" min="0">
+                  </label>
+                </div>
+                <div id="lab2-sliding-result" class="callout callout-tip"></div>
+              </div>
+
+              <div class="panel-card">
+                <h2>EP (균형가격) 결정 4단계 시뮬레이션</h2>
+                <p class="muted-small">내 Late LOC 주문(Price Sliding 적용 후)이 기존 장부에 합산되었을 때 4단계 규칙으로 EP가 결정되는 과정입니다.</p>
+                <div id="lab2-ep-table-wrap"></div>
+                <div id="lab2-ep-summary" class="ep-summary-box"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="sublab-nyse-dorder" class="sublab-box">
+            <div class="lab-grid">
+              <div class="panel-card">
+                <h2>NYSE D-Order 스텔스 작동 &amp; State Transition</h2>
+                <p class="muted-small">원문 Ch 14 예시: <strong>기본 지정가 $99.50 / 재량 한도 $100.50 / 매수 100,000주</strong></p>
+                <div class="form-grid">
+                  <label class="field field-full">
+                    <span>시뮬레이션 잠정 체결가 P: <strong id="lab2-p-val">$100.00</strong></span>
+                    <input type="range" id="lab2-p-slider" min="98.50" max="101.00" step="0.10" value="100.00">
+                  </label>
+                  <label class="field">
+                    <span>시장 기존 불균형 상태</span>
+                    <select id="lab2-imb-dir">
+                      <option value="sell">매도 초과 (Sell Imbalance 60,000주)</option>
+                      <option value="buy">매수 초과 (Buy Imbalance 40,000주)</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>현재 경매 시각 구간</span>
+                    <select id="lab2-nyse-phase">
+                      <option value="stealth">15:50:00 ~ 15:59:50 (스텔스 OIB 구간)</option>
+                      <option value="unmasked">15:59:50 ~ 16:00:00 (Lock-in &amp; Unmasked)</option>
+                    </select>
+                  </label>
+                </div>
+                <div id="lab2-dorder-result"></div>
+              </div>
+
+              <div class="panel-card">
+                <h2>NYSE 동일 가격대 Parity (1/N) 배분 계산기</h2>
+                <div class="form-grid">
+                  <label class="field">
+                    <span>체결 가능 매도 총량 (공급, 주)</span>
+                    <input type="number" id="lab2-par-supply" value="1200" min="100" step="100">
+                  </label>
+                  <label class="field">
+                    <span>Book Participant 주문량</span>
+                    <input type="number" id="lab2-par-book" value="1000" min="0" step="100">
+                  </label>
+                  <label class="field">
+                    <span>Floor Broker A (D-Order)</span>
+                    <input type="number" id="lab2-par-ba" value="200" min="0" step="100">
+                  </label>
+                  <label class="field">
+                    <span>Floor Broker B (D-Order)</span>
+                    <input type="number" id="lab2-par-bb" value="800" min="0" step="100">
+                  </label>
+                  <label class="field">
+                    <span>DMM Interest (Manual 시)</span>
+                    <input type="number" id="lab2-par-dmm" value="500" min="0" step="100">
+                  </label>
+                </div>
+                <div id="lab2-parity-result"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LAB 3: Order Flow & SOR Tracker -->
+        <div id="lab-flow" class="lab-panel">
+          <div class="panel-card">
+            <h2>주문 시나리오를 선택하여 시장 미시구조 경로를 추적하세요</h2>
+            <div class="scenario-buttons" id="lab3-scenarios"></div>
+            <div id="lab3-timeline" class="flow-tracker-wrap"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: GLOSSARY -->
+    <section id="view-glossary" class="view-section" aria-label="통합 용어 사전">
+      <div class="glossary-container">
+        <div class="glossary-header">
+          <div>
+            <h1>미국 자본시장 핵심 용어 사전</h1>
+            <p>본문에 등장하는 법규·참여자·주문유형·트레이딩 룰 핵심 용어 <strong id="glossary-total-num">70</strong>개를 검색하고 해당 챕터로 바로 이동하세요.</p>
+          </div>
+          <div class="glossary-search-box">
+            <input type="search" id="glossary-filter-input" placeholder="용어 검색 (예: NBBO, PFOF, ISO, D-Order, LULD...)" aria-label="용어 필터링">
+          </div>
+        </div>
+        <div class="glossary-cats" id="glossary-cats"></div>
+        <div class="glossary-grid" id="glossary-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Global Quick Search Modal -->
+  <dialog id="search-dialog" class="search-dialog" aria-labelledby="search-dialog-title">
+    <div class="search-modal-box">
+      <div class="search-modal-input-row">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="global-search-input" placeholder="챕터 내용, 법 조항(Rule 611), 용어(PFOF, CNS, D-Order) 검색..." aria-label="전체 검색">
+        <button type="button" class="btn btn-sm btn-ghost" id="close-search-btn">ESC</button>
+      </div>
+      <div id="search-dialog-title" class="sr-only">전체 문서 및 용어 검색</div>
+      <div class="search-modal-results" id="global-search-results"></div>
+    </div>
+  </dialog>
+
+  <script src="chapters-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
