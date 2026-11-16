@@ -536,6 +536,7 @@
     if (sidebar) sidebar.classList.add('is-open');
     if (backdrop) backdrop.hidden = false;
     if (btn) btn.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('drawer-open');
   }
 
   function closeMobileSidebar() {
@@ -545,6 +546,7 @@
     if (sidebar) sidebar.classList.remove('is-open');
     if (backdrop) backdrop.hidden = true;
     if (btn) btn.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('drawer-open');
   }
 
   function renderSidebar() {
@@ -617,6 +619,9 @@
   function renderChapterToc(chapter) {
     const tocList = document.getElementById('chapter-toc-list');
     const tocGlossary = document.getElementById('toc-glossary-box');
+    const mobileTocPanel = document.getElementById('mobile-toc-panel');
+    const mobileTocList = document.getElementById('mobile-toc-list');
+    const mobileTocGlossary = document.getElementById('mobile-toc-glossary');
     const hasSupp = Boolean(chapter.suppHtml && chapter.suppHtml.trim().length > 0);
 
     if (tocObserver) {
@@ -624,17 +629,19 @@
       tocObserver = null;
     }
 
-    if (tocList) {
-      const visibleToc = (chapter.toc || []).filter((item) => {
-        if (state.readMode === 'core') return item.section === 'core';
-        if (state.readMode === 'supp' && hasSupp) return item.section === 'supp';
-        return true;
-      });
+    if (mobileTocPanel) {
+      mobileTocPanel.open = false;
+    }
 
-      if (!visibleToc.length) {
-        tocList.innerHTML = '<span class="muted-small">표시할 하위 목차가 없습니다.</span>';
-      } else {
-        tocList.innerHTML = visibleToc
+    const visibleToc = (chapter.toc || []).filter((item) => {
+      if (state.readMode === 'core') return item.section === 'core';
+      if (state.readMode === 'supp' && hasSupp) return item.section === 'supp';
+      return true;
+    });
+
+    const tocHtml = !visibleToc.length
+      ? '<span class="muted-small">표시할 하위 목차가 없습니다.</span>'
+      : visibleToc
           .map(
             (item, idx) => `
             <a href="#${escapeHtml(item.id)}" class="toc-link level-${item.level}${idx === 0 ? ' is-active' : ''}" data-toc-target="${escapeHtml(item.id)}">
@@ -643,44 +650,50 @@
           )
           .join('');
 
-        const targets = visibleToc
-          .map((item) => document.getElementById(item.id))
-          .filter(Boolean);
+    if (tocList) tocList.innerHTML = tocHtml;
+    if (mobileTocList) mobileTocList.innerHTML = tocHtml;
 
-        if ('IntersectionObserver' in window && targets.length) {
-          tocObserver = new IntersectionObserver(
-            (entries) => {
-              const visible = entries.filter((e) => e.isIntersecting);
-              if (visible.length) {
-                const activeId = visible[0].target.id;
-                tocList.querySelectorAll('.toc-link').forEach((link) => {
-                  link.classList.toggle('is-active', link.getAttribute('data-toc-target') === activeId);
-                });
-              }
-            },
-            { rootMargin: '-84px 0px -70% 0px', threshold: 0.01 }
-          );
-          targets.forEach((el) => tocObserver.observe(el));
-        }
+    if (visibleToc.length) {
+      const targets = visibleToc
+        .map((item) => document.getElementById(item.id))
+        .filter(Boolean);
+
+      if ('IntersectionObserver' in window && targets.length) {
+        const topOffset = window.innerWidth <= 900 ? '-124px' : '-84px';
+        tocObserver = new IntersectionObserver(
+          (entries) => {
+            const visible = entries.filter((e) => e.isIntersecting);
+            if (visible.length) {
+              const activeId = visible[0].target.id;
+              document.querySelectorAll('.toc-link[data-toc-target]').forEach((link) => {
+                link.classList.toggle('is-active', link.getAttribute('data-toc-target') === activeId);
+              });
+            }
+          },
+          { rootMargin: `${topOffset} 0px -70% 0px`, threshold: 0.01 }
+        );
+        targets.forEach((el) => tocObserver.observe(el));
       }
     }
 
-    if (tocGlossary) {
-      const matched = DATA.glossary.filter((g) => g.ch === chapter.id);
-      if (!matched.length) {
-        tocGlossary.innerHTML = '';
-      } else {
-        tocGlossary.innerHTML = `
-          <div class="toc-title">이 챕터 핵심 용어 (${matched.length})</div>
-          <div class="toc-chip-wrap">
-            ${matched
-              .map(
-                (g) =>
-                  `<button type="button" class="toc-chip" data-jump-term="${escapeHtml(g.term)}" title="${escapeHtml(g.full)}">${escapeHtml(g.term)}</button>`
-              )
-              .join('')}
-          </div>`;
-      }
+    const matched = DATA.glossary.filter((g) => g.ch === chapter.id);
+    const glossaryHtml = !matched.length
+      ? ''
+      : `
+        <div class="toc-title">이 챕터 핵심 용어 (${matched.length})</div>
+        <div class="toc-chip-wrap">
+          ${matched
+            .map(
+              (g) =>
+                `<button type="button" class="toc-chip" data-jump-term="${escapeHtml(g.term)}" title="${escapeHtml(g.full)}">${escapeHtml(g.term)}</button>`
+            )
+            .join('')}
+        </div>`;
+
+    if (tocGlossary) tocGlossary.innerHTML = glossaryHtml;
+    if (mobileTocGlossary) mobileTocGlossary.innerHTML = glossaryHtml;
+    if (mobileTocPanel) {
+      mobileTocPanel.hidden = !visibleToc.length && !matched.length;
     }
   }
 
@@ -806,6 +819,10 @@
   }
 
   function updateReadingProgress() {
+    const topBtn = document.getElementById('back-to-top-btn');
+    if (topBtn) {
+      topBtn.hidden = window.scrollY < 360;
+    }
     const bar = document.getElementById('reading-progress-bar');
     if (!bar) return;
     if (state.view !== 'reader') {
@@ -1524,6 +1541,9 @@
     document.getElementById('mobile-menu-btn')?.addEventListener('click', openMobileSidebar);
     document.getElementById('sidebar-close-btn')?.addEventListener('click', closeMobileSidebar);
     document.getElementById('sidebar-backdrop')?.addEventListener('click', closeMobileSidebar);
+    document.getElementById('back-to-top-btn')?.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
     document.getElementById('toggle-complete-btn')?.addEventListener('click', () => {
       if (state.chapterId === 'overview') return;
@@ -1575,12 +1595,16 @@
       const tocLink = target.closest('[data-toc-target]');
       if (tocLink) {
         e.preventDefault();
+        const mobileTocPanel = document.getElementById('mobile-toc-panel');
+        if (mobileTocPanel && mobileTocPanel.contains(tocLink)) {
+          mobileTocPanel.open = false;
+        }
         const headingId = tocLink.getAttribute('data-toc-target');
         const headingEl = headingId ? document.getElementById(headingId) : null;
         if (headingEl) {
           headingEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          document.querySelectorAll('#chapter-toc-list .toc-link').forEach((l) => {
-            l.classList.toggle('is-active', l === tocLink);
+          document.querySelectorAll('.toc-link[data-toc-target]').forEach((l) => {
+            l.classList.toggle('is-active', l.getAttribute('data-toc-target') === headingId);
           });
         }
         return;
