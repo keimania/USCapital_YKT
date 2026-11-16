@@ -2,7 +2,11 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#1d4ed8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <title>미국 자본시장 구조 — 인터랙티브 학습 포털</title>
   <meta name="description" content="[20261113]_미국_자본시장구조.pdf 기반 14개 챕터 해설, 용어 사전, 미시구조 시뮬레이터">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,10 +48,18 @@
       </div>
 
       <nav class="primary-nav" role="tablist" aria-label="주요 화면 전환">
-        <button type="button" class="nav-tab is-active" role="tab" aria-selected="true" data-view="home">홈 / 전체 지도</button>
-        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="reader">챕터 학습</button>
-        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="labs">인터랙티브 랩</button>
-        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="glossary">용어 사전 <span class="pill-count" id="nav-glossary-count">70</span></button>
+        <button type="button" class="nav-tab is-active" role="tab" aria-selected="true" data-view="home">
+          <span class="nav-label-full">홈 / 전체 지도</span><span class="nav-label-short">홈</span>
+        </button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="reader">
+          <span class="nav-label-full">챕터 학습</span><span class="nav-label-short">챕터</span>
+        </button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="labs">
+          <span class="nav-label-full">인터랙티브 랩</span><span class="nav-label-short">실습 랩</span>
+        </button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-view="glossary">
+          <span class="nav-label-full">용어 사전</span><span class="nav-label-short">용어</span> <span class="pill-count" id="nav-glossary-count">70</span>
+        </button>
       </nav>
 
       <div class="topbar-right">
@@ -168,6 +180,17 @@
               <button type="button" class="btn btn-sm btn-outline" id="toggle-complete-btn">✓ 학습 완료 표시</button>
             </div>
           </div>
+
+          <details class="mobile-toc-panel" id="mobile-toc-panel">
+            <summary class="mobile-toc-summary">
+              <span>이 챕터 세부 목차 · 핵심 용어</span>
+              <span class="mobile-toc-chevron" aria-hidden="true">▾</span>
+            </summary>
+            <div class="mobile-toc-body">
+              <nav id="mobile-toc-list" class="toc-list" aria-label="모바일 챕터 세부 목차"></nav>
+              <div id="mobile-toc-glossary" class="toc-glossary-box"></div>
+            </div>
+          </details>
 
           <div id="chapter-body-core" class="prose"></div>
           <div id="chapter-supp-banner" class="supp-divider" hidden>
@@ -390,6 +413,10 @@
       </div>
     </section>
   </main>
+
+  <button type="button" class="back-to-top-btn" id="back-to-top-btn" aria-label="맨 위로 이동" title="맨 위로 이동" hidden>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
 
   <!-- Global Quick Search Modal -->
   <dialog id="search-dialog" class="search-dialog" aria-labelledby="search-dialog-title">
