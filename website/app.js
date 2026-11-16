@@ -722,15 +722,18 @@
                 if (oi === qz.ans) cls += ' is-correct';
                 else if (oi === picked) cls += ' is-wrong';
               }
-              return `<button type="button" class="${cls}" data-quiz-idx="${qi}" data-opt-idx="${oi}">${escapeHtml(opt)}</button>`;
+              const optContent = (qz.optsHtml && qz.optsHtml[oi]) || escapeHtml(opt);
+              return `<button type="button" class="${cls}" data-quiz-idx="${qi}" data-opt-idx="${oi}">${optContent}</button>`;
             })
             .join('');
+          const expContent = qz.expHtml || escapeHtml(qz.exp);
           const expHtml = answered
-            ? `<div class="quiz-exp"><strong>${picked === qz.ans ? '정답!' : '오답입니다.'}</strong> ${escapeHtml(qz.exp)}</div>`
+            ? `<div class="quiz-exp"><strong>${picked === qz.ans ? '정답!' : '오답입니다.'}</strong> ${expContent}</div>`
             : '';
+          const qContent = qz.qHtml || escapeHtml(qz.q);
           return `
             <div class="quiz-item">
-              <div class="quiz-q">Q${qi + 1}. ${escapeHtml(qz.q)}</div>
+              <div class="quiz-q">Q${qi + 1}. ${qContent}</div>
               <div class="quiz-opts">${optsHtml}</div>
               ${expHtml}
             </div>`;
@@ -762,13 +765,16 @@
       const partCfg = PART_META.find((p) => p.key === ch.part);
       const badgeCls = partCfg ? partCfg.badgeClass : 'badge-emerald';
       const numLabel = isNumberedChapter(ch) ? `Chapter ${formatChapterNum(ch)}` : 'Guide';
-      const questionsHtml =
-        ch.questions && ch.questions.length
-          ? `<div class="ch-questions-box">
-               <strong>핵심 질문 (Key Questions)</strong>
-               <ol>${ch.questions.map((q) => `<li>${escapeHtml(q)}</li>`).join('')}</ol>
-             </div>`
-          : '';
+      const qItems =
+        ch.questionsHtml && ch.questionsHtml.length
+          ? ch.questionsHtml
+          : (ch.questions || []).map((q) => escapeHtml(q));
+      const questionsHtml = qItems.length
+        ? `<div class="ch-questions-box">
+             <strong>핵심 질문 (Key Questions)</strong>
+             <ol>${qItems.map((qHtml) => `<li>${qHtml}</li>`).join('')}</ol>
+           </div>`
+        : '';
 
       headerCard.innerHTML = `
         <div class="ch-header-badges">
@@ -1573,6 +1579,7 @@
 
       const openCh = target.closest('[data-open-chapter]');
       if (openCh) {
+        e.preventDefault();
         const chId = openCh.getAttribute('data-open-chapter');
         if (chId) {
           closeMobileSidebar();

@@ -8,10 +8,11 @@ chapters/*.md 문서를 파싱하여 웹사이트용 정적 데이터(website/ch
 
 from __future__ import annotations
 
+import html as html_lib
 import json
 import re
 from pathlib import Path
-import markdown
+import mistune
 from bs4 import BeautifulSoup, Tag
 
 ROOT = Path(__file__).resolve().parent
@@ -659,23 +660,57 @@ def preprocess_markdown(raw_md: str, chapter_id: str) -> tuple[str, list[str], s
     return title, questions, core_md.strip(), supp_md.strip()
 
 
+MD_RENDERER = mistune.create_markdown(escape=False, plugins=["table", "strikethrough"])
+FILE_TO_CHAPTER_ID = {entry["file"]: entry["id"] for entry in CHAPTER_MANIFEST}
+
+
+def clean_latex_expr(expr: str) -> str:
+    """가벼운 LaTeX 수식을 깔끔한 텍스트로 정규화합니다."""
+    out = expr.strip()
+    out = re.sub(r"\\text\{([^{}]*)\}", r"\1", out)
+    out = out.replace(r"\times", "×").replace(r"\div", "÷")
+    out = out.replace(r"\le", "≤").replace(r"\ge", "≥").replace(r"\neq", "≠").replace(r"\approx", "≈")
+    return out
+
+
+def render_inline_md(text: str) -> str:
+    """단일 문장/항목의 인라인 마크다운을 HTML로 변환합니다."""
+    if not text:
+        return ""
+    rendered = MD_RENDERER(text).strip()
+    if rendered.startswith("<p>") and rendered.endswith("</p>") and rendered.count("<p>") == 1:
+        return rendered[3:-4]
+    return rendered
+
+
+def strip_html_text(fragment: str) -> str:
+    if not fragment:
+        return ""
+    return re.sub(r"\s+", " ", BeautifulSoup(fragment, "html.parser").get_text(" ", strip=True))
+
+
 def md_to_rich_html(md_text: str, chapter_id: str, diagram_counter: list[int]) -> str:
     if not md_text.strip():
         return ""
 
-    # 1. $$ ... $$ 수식 블록을 플레이스홀더로 보호
+    # 1. $$ ... $$ 수식 블록 및 $\command$ 인라인 수식을 플레이스홀더로 보호
     math_blocks: list[str] = []
 
-    def replace_math(match: re.Match) -> str:
-        expr = match.group(1).strip()
-        # 가벼운 LaTeX 명령을 깔끔한 텍스트/HTML 표기로 정리
-        expr = expr.replace(r"\text{", "").replace("}", "")
-        expr = expr.replace(r"\times", "×").replace(r"\div", "÷")
+    def replace_block_math(match: re.Match) -> str:
+        expr = html_lib.escape(clean_latex_expr(match.group(1)))
         idx = len(math_blocks)
         math_blocks.append(f'<div class="math-formula"><code>{expr}</code></div>')
         return f"\n\n@@MATH_{idx}@@\n\n"
 
-    processed = re.sub(r"\$\$(.*?)\$\$", replace_math, md_text, flags=re.DOTALL)
+    processed = re.sub(r"\$\$(.*?)\$\$", replace_block_math, md_text, flags=re.DOTALL)
+
+    def replace_inline_math(match: re.Match) -> str:
+        expr = html_lib.escape(clean_latex_expr(match.group(1)))
+        idx = len(math_blocks)
+        math_blocks.append(f"<code>{expr}</code>")
+        return f"@@MATH_{idx}@@"
+
+    processed = re.sub(r"\$(?=[^$\n]*\\[a-zA-Z]+)([^$\n]+)\$", replace_inline_math, processed)
 
     # 2. ```mermaid ... ``` 블록을 커스텀 반응형 HTML 다이어그램으로 보호
     diagram_blocks: list[str] = []
@@ -685,7 +720,7 @@ def md_to_rich_html(md_text: str, chapter_id: str, diagram_counter: list[int]) -
         diagram_counter[0] += 1
         html_diag = DIAGRAM_HTML_MAP.get((chapter_id, d_idx))
         if not html_diag:
-            code_raw = match.group(1).strip()
+            code_raw = html_lib.escape(match.group(1).strip())
             html_diag = f'<pre class="diagram-fallback"><code>{code_raw}</code></pre>'
         idx = len(diagram_blocks)
         diagram_blocks.append(html_diag)
@@ -693,11 +728,8 @@ def md_to_rich_html(md_text: str, chapter_id: str, diagram_counter: list[int]) -
 
     processed = re.sub(r"```mermaid\s*(.*?)```", replace_mermaid, processed, flags=re.DOTALL)
 
-    # 3. Markdown -> HTML 변환
-    html = markdown.markdown(
-        processed,
-        extensions=["tables", "fenced_code", "sane_lists"],
-    )
+    # 3. Markdown -> HTML 변환 (GFM 호환 mistune으로 한글 조사 결합 **...** 및 중첩 목록 정확 파싱)
+    html = MD_RENDERER(processed)
 
     # 플레이스홀더 복원
     for i, diag in enumerate(diagram_blocks):
@@ -705,8 +737,16 @@ def md_to_rich_html(md_text: str, chapter_id: str, diagram_counter: list[int]) -
     for i, math_html in enumerate(math_blocks):
         html = html.replace(f"<p>@@MATH_{i}@@</p>", math_html).replace(f"@@MATH_{i}@@", math_html)
 
-    # 4. BeautifulSoup 후처리 (콜아웃 카드, 테이블 반응형 래퍼, 헤딩 ID)
+    # 4. BeautifulSoup 후처리 (콜아웃 카드, 내부 챕터 링크 변환, 테이블 반응형 래퍼)
     soup = BeautifulSoup(html, "html.parser")
+
+    for a in soup.find_all("a", href=True):
+        href = a["href"].strip()
+        normalized = href.lstrip("./")
+        target_id = FILE_TO_CHAPTER_ID.get(normalized)
+        if target_id:
+            a["href"] = f"#reader/{target_id}"
+            a["data-open-chapter"] = target_id
 
     for bq in soup.find_all("blockquote"):
         text_preview = bq.get_text(" ", strip=True)
@@ -770,6 +810,20 @@ def build() -> None:
         plain_text = BeautifulSoup(core_html + " " + supp_html, "html.parser").get_text(" ", strip=True)
         plain_text = re.sub(r"\s+", " ", plain_text)
 
+        questions_html = [render_inline_md(q) for q in questions]
+        questions_plain = [strip_html_text(qh) for qh in questions_html]
+        quizzes_out = []
+        for qz in QUIZ_DATA.get(entry["id"], []):
+            quizzes_out.append({
+                "q": strip_html_text(render_inline_md(qz["q"])),
+                "qHtml": render_inline_md(qz["q"]),
+                "opts": [strip_html_text(render_inline_md(o)) for o in qz["opts"]],
+                "optsHtml": [render_inline_md(o) for o in qz["opts"]],
+                "ans": qz["ans"],
+                "exp": strip_html_text(render_inline_md(qz["exp"])),
+                "expHtml": render_inline_md(qz["exp"]),
+            })
+
         chapters_out.append({
             "id": entry["id"],
             "num": entry["num"],
@@ -780,12 +834,13 @@ def build() -> None:
             "sourceRef": entry["sourceRef"],
             "readMin": entry["readMin"],
             "mdPath": f"chapters/{entry['file']}",
-            "questions": questions,
+            "questions": questions_plain,
+            "questionsHtml": questions_html,
             "coreHtml": core_html,
             "suppHtml": supp_html,
             "toc": toc,
             "searchText": plain_text,
-            "quizzes": QUIZ_DATA.get(entry["id"], []),
+            "quizzes": quizzes_out,
         })
 
     payload = {
